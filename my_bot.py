@@ -2,13 +2,12 @@ import streamlit as st
 from bot import predict_class, get_response, recognize_entities
 import json
 import random
-import os
 from PIL import Image
 from io import BytesIO
 import base64
-import speech_recognition as sr
-from microphone_component import microphone_access_component  # Custom component for microphone access
 import sounddevice as sd
+from scipy.io.wavfile import write
+import speech_recognition as sr
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
@@ -24,19 +23,23 @@ def get_response(return_list, data_json):
                 break
     return result
 
-def recognize_speech_from_mic(recognizer, microphone):
-    with microphone as source:
-        st.info("Adjusting for ambient noise, please wait...")
-        recognizer.adjust_for_ambient_noise(source)
-        st.info("Recording, speak now...")
-        audio = recognizer.listen(source)
-        st.info("Recognizing speech...")
-        try:
-            response = recognizer.recognize_google(audio)
-        except sr.RequestError:
-            response = "API unavailable"
-        except sr.UnknownValueError:
-            response = "Unable to recognize speech"
+def record_audio(duration=5, fs=44100):
+    st.info("Recording, speak now...")
+    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    sd.wait()  # Wait until recording is finished
+    write('output.wav', fs, recording)  # Save as WAV file
+    st.success("Recording complete")
+
+def recognize_speech_from_file(file_path):
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(file_path) as source:
+        audio = recognizer.record(source)
+    try:
+        response = recognizer.recognize_google(audio)
+    except sr.RequestError:
+        response = "API unavailable"
+    except sr.UnknownValueError:
+        response = "Unable to recognize speech"
     return response
 
 def main(intents):
@@ -46,8 +49,6 @@ def main(intents):
         return_list = predict_class(message)
         response = get_response(return_list, data_json=intents)
         st.text_area("GMC's Response:", response, height=200)
-        # entities = recognize_entities(message)
-        # st.write(f"Entities: {entities}")
 
 # Open the logo image
 logo_image = Image.open('logo1.png')
@@ -128,13 +129,12 @@ st.sidebar.markdown(
 # Main app where user enters prompt and gets the response
 user_input = st.text_area("You:", "", key="user_input")
 
-# Add a microphone button
-microphone_access_component()  # Custom component for requesting microphone access
-
+# Add a microphone button to record audio
 if st.button("🎤"):
     record_audio()
     user_input = recognize_speech_from_file('output.wav')
-    st.text_area("Recognized Text:", value=user_input, height=50)
+    st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
+    # Generate a response based on the recognized text
     return_list = predict_class(user_input)
     response = get_response(return_list, data_json=data)
     st.text_area("GMC's Response:", response, height=200)
