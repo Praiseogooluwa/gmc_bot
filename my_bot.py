@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 import base64
 import speech_recognition as sr
-import PyAudio
+
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
