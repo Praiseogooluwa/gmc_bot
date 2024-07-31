@@ -238,7 +238,7 @@ st.markdown("""
             background-color: #4CAF50;
         }
         .consultant .status.offline {
-            background-color: #FF5252;
+            background-color: grey;
         }
         .stButton>button {
             background-color: #e53935;
