@@ -32,6 +32,8 @@ def record_audio(duration=5, fs=44100, device=None):
         st.success("Recording complete")
     except Exception as e:
         st.error(f"An error occurred while recording: {e}")
+        return False
+    return True
 
 def recognize_speech_from_file(file_path):
     recognizer = sr.Recognizer()
@@ -136,18 +138,18 @@ user_input = st.text_area("You:", "", key="user_input")
 available_devices = sd.query_devices()
 st.write("Available audio devices:", available_devices)
 
-# Specify the input device if needed (replace 'default' with the correct device ID)
-input_device = 'default'
-
 # Add a microphone button to record audio
 if st.button("🎤"):
-    record_audio(device=input_device)
-    user_input = recognize_speech_from_file('output.wav')
-    st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
-    # Generate a response based on the recognized text
-    return_list = predict_class(user_input)
-    response = get_response(return_list, data_json=data)
-    st.text_area("GMC's Response:", response, height=200)
+    # Attempt to record audio
+    if record_audio():
+        user_input = recognize_speech_from_file('output.wav')
+        st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
+        # Generate a response based on the recognized text
+        return_list = predict_class(user_input)
+        response = get_response(return_list, data_json=data)
+        st.text_area("GMC's Response:", response, height=200)
+    else:
+        st.error("Recording failed. Please ensure you have a working microphone and try again.")
 
 generate_button = st.button("Generate Response")
 
