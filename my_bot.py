@@ -1,13 +1,13 @@
 import streamlit as st
-import json
 from bot import predict_class, get_response, recognize_entities
+import json
 import random
 import os
 from PIL import Image
 from io import BytesIO
 import base64
 import speech_recognition as sr
-
+from microphone_component import microphone_access_component  # Custom component for microphone access
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
@@ -23,6 +23,21 @@ def get_response(return_list, data_json):
                 break
     return result
 
+def recognize_speech_from_mic(recognizer, microphone):
+    with microphone as source:
+        st.info("Adjusting for ambient noise, please wait...")
+        recognizer.adjust_for_ambient_noise(source)
+        st.info("Recording, speak now...")
+        audio = recognizer.listen(source)
+        st.info("Recognizing speech...")
+        try:
+            response = recognizer.recognize_google(audio)
+        except sr.RequestError:
+            response = "API unavailable"
+        except sr.UnknownValueError:
+            response = "Unable to recognize speech"
+    return response
+
 def main(intents):
     st.write("Enter your message:")
     message = st.text_input("", "")
@@ -30,13 +45,11 @@ def main(intents):
         return_list = predict_class(message)
         response = get_response(return_list, data_json=intents)
         st.text_area("GMC's Response:", response, height=200)
-        #entities = recognize_entities(message)
-        #st.write(f"Entities: {entities}")
+        # entities = recognize_entities(message)
+        # st.write(f"Entities: {entities}")
 
 # Open the logo image
 logo_image = Image.open('logo1.png')
-
-# Convert the image to a base64-encoded string
 buffered = BytesIO()
 logo_image.save(buffered, format="PNG")
 logo_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
@@ -52,6 +65,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 st.write("Made with love by - [Praise Ogooluwa Bakare](https://praiseogooluwa.github.io/)")
 st.write("#### Welcome to GMC help and support! Type your message below:")
 
@@ -70,90 +84,37 @@ st.sidebar.markdown(
 st.sidebar.markdown("# Contact Our Educational Consultants")
 
 # Consultant profile
-consultant_image = Image.open('esther.jpg')
+def get_consultant_image(file_path):
+    image = Image.open(file_path)
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-buffered = BytesIO()
-consultant_image.save(buffered, format="JPEG")
-consultant_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-# Consultant profile1
-consultant_image1 = Image.open('dele.jpeg')
-
-buffered = BytesIO()
-consultant_image1.save(buffered, format="JPEG")
-consultant_base164 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-# Consultant profile2
-consultant_image2 = Image.open('tope.jpeg')
-
-buffered = BytesIO()
-consultant_image2.save(buffered, format="JPEG")
-consultant_base264 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-# Consultant profile3
-consultant_image3 = Image.open('praise.jpg')
-
-buffered = BytesIO()
-consultant_image3.save(buffered, format="JPEG")
-consultant_base364 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+consultants = [
+    {"name": "Esther Abiona", "image": "esther.jpg", "link": "https://wa.link/8b4aht"},
+    {"name": "Dele Fayemi", "image": "dele.jpeg", "link": "https://wa.link/kfpbnn"},
+    {"name": "Temitope Bamidele", "image": "tope.jpeg", "link": "https://wa.link/d7gbl9"},
+    {"name": "Praise Ogooluwa", "image": "praise.jpg", "link": "https://wa.link/f7tm3h"}
+]
 
 st.sidebar.markdown("### Meet Our Consultants")
-st.sidebar.markdown(
-    f"""
-    <div class="consultant">
-        <a href="https://wa.link/8b4aht" target="_blank">
-            <img src="data:image/jpeg;base64,{consultant_base64}" alt="Esther Abiona" class="consultant-img">
-        </a>
-        <div>
-            <strong>Esther Abiona</strong><br>
-            <span class="status online"></span>
+for consultant in consultants:
+    img_base64 = get_consultant_image(consultant["image"])
+    status = "online" if consultant["name"] != "Praise Ogooluwa" else "offline"
+    st.sidebar.markdown(
+        f"""
+        <div class="consultant">
+            <a href="{consultant["link"]}" target="_blank">
+                <img src="data:image/jpeg;base64,{img_base64}" alt="{consultant["name"]}" class="consultant-img">
+            </a>
+            <div>
+                <strong>{consultant["name"]}</strong><br>
+                <span class="status {status}"></span>
+            </div>
         </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.sidebar.markdown(
-    f"""
-    <div class="consultant">
-        <a href="https://wa.link/kfpbnn" target="_blank">
-            <img src="data:image/jpeg;base64,{consultant_base164}" alt="Dele Fayemi" class="consultant-img">
-        </a>
-        <div>
-            <strong>Dele Fayemi</strong><br>
-            <span class="status online"></span>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.sidebar.markdown(
-    f"""
-    <div class="consultant">
-        <a href="https://wa.link/d7gbl9" target="_blank">
-            <img src="data:image/jpeg;base64,{consultant_base264}" alt="TemiTope Bamidele" class="consultant-img">
-        </a>
-        <div>
-            <strong>Temitope Bamidele</strong><br>
-            <span class="status online"></span>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.sidebar.markdown(
-    f"""
-    <div class="consultant">
-        <a href="https://wa.link/f7tm3h" target="_blank">
-            <img src="data:image/jpeg;base64,{consultant_base364}" alt="Praise Ogooluwa" class="consultant-img">
-        </a>
-        <div>
-            <strong>Praise Ogooluwa</strong><br>
-            <span class="status offline"></span>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        """,
+        unsafe_allow_html=True
+    )
 
 st.sidebar.markdown(
     """
@@ -163,35 +124,27 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Function to recognize speech and convert to text
-def recognize_speech_from_mic(recognizer, microphone):
-    with microphone as source:
-        st.info("Adjusting for ambient noise, please wait...")
-        recognizer.adjust_for_ambient_noise(source)
-        st.info("Recording, speak now...")
-        audio = recognizer.listen(source)
-        st.info("Recognizing speech...")
-        try:
-            response = recognizer.recognize_google(audio)
-        except sr.RequestError:
-            response = "API unavailable"
-        except sr.UnknownValueError:
-            response = "Unable to recognize speech"
-    return response
-
 # Main app where user enters prompt and gets the response
 user_input = st.text_area("You:", "", key="user_input")
 
 # Add a microphone button
+microphone_access_component()  # Custom component for requesting microphone access
+
 if st.button("🎤"):
     recognizer = sr.Recognizer()
     microphone = sr.Microphone()
-    user_input = recognize_speech_from_mic(recognizer, microphone)
-    st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
-    # Generate a response based on the recognized text
-    return_list = predict_class(user_input)
-    response = get_response(return_list, data_json=data)
-    st.text_area("GMC's Response:", response, height=200)
+    try:
+        user_input = recognize_speech_from_mic(recognizer, microphone)
+        st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
+        # Generate a response based on the recognized text
+        return_list = predict_class(user_input)
+        response = get_response(return_list, data_json=data)
+        st.text_area("GMC's Response:", response, height=200)
+    except OSError as e:
+        st.error("No Default Input Device Available. Please connect a microphone.")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+
 generate_button = st.button("Generate Response")
 
 # Chat history
@@ -348,8 +301,8 @@ st.markdown("""
                 font-size: 1.5em;
             }
             .header .logo {
-                width: 27%;  /* Increase the percentage to make the logo wider */
-                max-width: 150px;  /* Increase the pixel value to make the logo larger */
+                width: 27%;
+                max-width: 150px;
                 margin: 15px 0;
             }
             .header .title {
