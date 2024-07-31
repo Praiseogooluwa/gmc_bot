@@ -1,13 +1,13 @@
 import streamlit as st
-from bot import predict_class, get_response, recognize_entities
-import json
-import random
-from PIL import Image
-from io import BytesIO
-import base64
 import sounddevice as sd
 from scipy.io.wavfile import write
 import speech_recognition as sr
+from bot import predict_class, get_response
+from PIL import Image
+from io import BytesIO
+import base64
+import json
+import random
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
@@ -23,12 +23,15 @@ def get_response(return_list, data_json):
                 break
     return result
 
-def record_audio(duration=5, fs=44100):
+def record_audio(duration=5, fs=44100, device=None):
     st.info("Recording, speak now...")
-    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()  # Wait until recording is finished
-    write('output.wav', fs, recording)  # Save as WAV file
-    st.success("Recording complete")
+    try:
+        recording = sd.rec(int(duration * fs), samplerate=fs, channels=1, device=device)
+        sd.wait()  # Wait until recording is finished
+        write('output.wav', fs, recording)  # Save as WAV file
+        st.success("Recording complete")
+    except Exception as e:
+        st.error(f"An error occurred while recording: {e}")
 
 def recognize_speech_from_file(file_path):
     recognizer = sr.Recognizer()
@@ -129,9 +132,16 @@ st.sidebar.markdown(
 # Main app where user enters prompt and gets the response
 user_input = st.text_area("You:", "", key="user_input")
 
+# Check available audio devices
+available_devices = sd.query_devices()
+st.write("Available audio devices:", available_devices)
+
+# Specify the input device if needed (replace 'default' with the correct device ID)
+input_device = 'default'
+
 # Add a microphone button to record audio
 if st.button("🎤"):
-    record_audio()
+    record_audio(device=input_device)
     user_input = recognize_speech_from_file('output.wav')
     st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
     # Generate a response based on the recognized text
@@ -215,34 +225,30 @@ st.markdown("""
             width: 50px;
             height: 55px;
         }
-        .status {
+        .consultant .status {
             display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
+            margin-right: 5px;
         }
-        .status.online {
-            background-color: green;
+        .consultant .status.online {
+            background-color: #4CAF50;
         }
-        .status.offline {
-            background-color: grey;
+        .consultant .status.offline {
+            background-color: #FF5252;
         }
-        .stTextInput>div>div>textarea {
-            background-color: #ffffff;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        .stButton button {
+        .stButton>button {
             background-color: #e53935;
-            color: white;
-            font-weight: bold;
-            border-radius: 5px;
+            color: #ffffff;
             border: none;
             padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Times New Roman', serif;
         }
-        .stButton button:hover {
+        .stButton>button:hover {
             background-color: #c62828;
         }
         .stTextArea>div>textarea {
