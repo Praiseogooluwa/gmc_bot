@@ -131,10 +131,10 @@ microphone_access_component()  # Custom component for requesting microphone acce
 
 if st.button("🎤"):
     recognizer = sr.Recognizer()
-   try:
-    microphone = sr.Microphone()
-    try:
-         user_input = recognize_speech_from_mic(recognizer, microphone)
+try:
+        microphone = sr.Microphone()
+        try:
+            user_input = recognize_speech_from_mic(recognizer, microphone)
             st.text_area("Recognized Text:", value=user_input, height=50, key="recognized_text")
             # Generate a response based on the recognized text
             return_list = predict_class(user_input)
@@ -148,7 +148,7 @@ if st.button("🎤"):
     except OSError:
         st.error("No Default Input Device Available. Please connect a microphone.")
     except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
+        st.error(f"An unexpected error occurred: {e}"))
 
 generate_button = st.button("Generate Response")
 
