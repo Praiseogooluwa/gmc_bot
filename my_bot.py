@@ -152,7 +152,7 @@ if generate_button and user_input.strip() != "":
     return_list = predict_class(user_input)
     response = get_response(return_list, data_json=data)
     st.text_area("GMC's Response:", response, height=100)
-    speak_response(response)  # Speak the response
+    #speak_response(response)  # Speak the response
 
 # Additional styling to make the app visually appealing
 st.markdown("""
