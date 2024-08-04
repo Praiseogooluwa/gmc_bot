@@ -7,7 +7,7 @@ from io import BytesIO
 import base64
 import speech_recognition as sr
 from microphone_component import microphone_access_component  # Custom component for microphone access
-import pyttsx3  # For text-to-speech
+#import pyttsx3  # For text-to-speech
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
