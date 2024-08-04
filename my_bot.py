@@ -39,10 +39,10 @@ def recognize_speech_from_mic(recognizer, microphone):
     return response
 
 # Function to speak the response
-#def speak_response(text):
-    #engine = pyttsx3.init()
-    #engine.say(text)
-    #engine.runAndWait()
+# def speak_response(text):
+    # engine = pyttsx3.init()
+    # engine.say(text)
+    # engine.runAndWait()
 
 def main(intents):
     st.write("Enter your message:")
@@ -51,7 +51,7 @@ def main(intents):
         return_list = predict_class(message)
         response = get_response(return_list, data_json=intents)
         st.text_area("GMC's Response:", response, height=100)
-        speak_response(response)  # Speak the response
+       # speak_response(response)  # Speak the response
 
 # Open the logo image
 logo_image = Image.open('logo1.png')
