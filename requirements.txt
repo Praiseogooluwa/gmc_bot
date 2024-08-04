@@ -9,4 +9,5 @@ SpeechRecognition==3.10.4
 scipy==1.11.4
 sounddevice==0.4.7
 pillow==10.4.0
+PyAudio==0.2.14
 #pyttsx3==2.90
