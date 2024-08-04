@@ -7,7 +7,7 @@ from io import BytesIO
 import base64
 import speech_recognition as sr
 from microphone_component import microphone_access_component  # Custom component for microphone access
-#import pyttsx3  # For text-to-speech
+# import pyttsx3  # For text-to-speech
 
 # Load the intents from the intents.json file
 with open('intents.json', 'r') as file:
@@ -51,7 +51,7 @@ def main(intents):
         return_list = predict_class(message)
         response = get_response(return_list, data_json=intents)
         st.text_area("GMC's Response:", response, height=100)
-       # speak_response(response)  # Speak the response
+        # speak_response(response)  # Speak the response
 
 # Open the logo image
 logo_image = Image.open('logo1.png')
@@ -131,7 +131,7 @@ microphone_access_component()  # Custom component for requesting microphone acce
 
 if st.button("🎤"):
     recognizer = sr.Recognizer()
-try:
+    try:
         microphone = sr.Microphone()
         try:
             user_input = recognize_speech_from_mic(recognizer, microphone)
@@ -140,7 +140,7 @@ try:
             return_list = predict_class(user_input)
             response = get_response(return_list, data_json=data)
             st.text_area("GMC's Response:", response, height=100)
-            #speak_response(response)  # Speak the response
+            # speak_response(response)  # Speak the response
         except sr.RequestError:
             st.error("Could not request results; check your network connection.")
         except sr.UnknownValueError:
@@ -148,7 +148,7 @@ try:
     except OSError:
         st.error("No Default Input Device Available. Please connect a microphone.")
     except Exception as e:
-        st.error(f"An unexpected error occurred: {e}"))
+        st.error(f"An unexpected error occurred: {e}")
 
 generate_button = st.button("Generate Response")
 
@@ -157,7 +157,7 @@ if generate_button and user_input.strip() != "":
     return_list = predict_class(user_input)
     response = get_response(return_list, data_json=data)
     st.text_area("GMC's Response:", response, height=100)
-    #speak_response(response)  # Speak the response
+    # speak_response(response)  # Speak the response
 
 # Additional styling to make the app visually appealing
 st.markdown("""
@@ -247,32 +247,7 @@ body {
     background-color: green;
 }
 .status.offline {
-    background-color: grey;
-}
-.stTextInput>div>div>textarea {
-    background-color: #ffffff;
-    color: #333;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-}
-.stButton button {
     background-color: red;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.stButton button:hover {
-    background-color: darkred;
-}
-.stTextArea textarea {
-    background-color: #ffffff;
-    color: #333;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
 }
 .sidebar-link {
     color: blue;
@@ -281,41 +256,8 @@ body {
 .sidebar-link:hover {
     text-decoration: underline;
 }
-.info-message {
-    margin-bottom: 0px; /* Reduce space between microphone access request and icon */
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-    }
-    .header .logo {
-        width: 50%;
-    }
-    .header .title {
-        font-size: 2em;
-    }
-    .consultant .consultant-img {
-        width: 40px;
-        height: 45px;
-    }
-    .footer {
-        text-align: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .header .title {
-        font-size: 1.5em;
-    }
-    .consultant .consultant-img {
-        width: 35px;
-        height: 40px;
-    }
-}
 </style>
 """, unsafe_allow_html=True)
 
-# Run the main function
+# Call the main function
 main(data)
