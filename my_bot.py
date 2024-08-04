@@ -39,10 +39,10 @@ def recognize_speech_from_mic(recognizer, microphone):
     return response
 
 # Function to speak the response
-def speak_response(text):
-    engine = pyttsx3.init()
-    engine.say(text)
-    engine.runAndWait()
+#def speak_response(text):
+    #engine = pyttsx3.init()
+    #engine.say(text)
+    #engine.runAndWait()
 
 def main(intents):
     st.write("Enter your message:")
