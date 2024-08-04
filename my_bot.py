@@ -131,6 +131,7 @@ microphone_access_component()  # Custom component for requesting microphone acce
 
 if st.button("🎤"):
     recognizer = sr.Recognizer()
+   try:
     microphone = sr.Microphone()
     try:
          user_input = recognize_speech_from_mic(recognizer, microphone)
