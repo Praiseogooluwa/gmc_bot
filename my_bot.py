@@ -247,7 +247,7 @@ body {
     background-color: green;
 }
 .status.offline {
-    background-color: red;
+    background-color: grey;
 }
 .sidebar-link {
     color: blue;
